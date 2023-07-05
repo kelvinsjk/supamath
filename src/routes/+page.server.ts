@@ -8,7 +8,7 @@ export const load = (async () => {
 		prisma.v2022p1q1.findMany({
 			where: { checked: false, flagged: false, og: false },
 			//where: { og: true },
-			take: 100
+			take: 5
 		})
 	]);
 

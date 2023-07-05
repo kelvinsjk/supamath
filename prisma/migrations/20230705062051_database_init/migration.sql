@@ -1,0 +1,18 @@
+-- CreateTable
+CREATE TABLE "v2022p1q1" (
+    "id" TEXT NOT NULL,
+    "a" INTEGER NOT NULL,
+    "b" INTEGER NOT NULL,
+    "x1" INTEGER NOT NULL,
+    "y1" INTEGER NOT NULL,
+    "x2" INTEGER NOT NULL,
+    "y2" INTEGER NOT NULL,
+    "x3" INTEGER NOT NULL,
+    "y3" INTEGER NOT NULL,
+    "b2" INTEGER NOT NULL,
+    "checked" BOOLEAN NOT NULL DEFAULT false,
+    "flagged" BOOLEAN NOT NULL DEFAULT false,
+    "og" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "v2022p1q1_pkey" PRIMARY KEY ("id")
+);

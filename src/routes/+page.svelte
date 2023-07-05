@@ -119,7 +119,7 @@
 			console.log(`${outcome}`, response);
 			if (response.status===200){
 				i++;
-				count++;
+				count--;
 				if (i < vars.length){
 					varRow = vars[i];
 					[qn, ans, ansGen, soln] = qnGen(varRow);
@@ -165,7 +165,7 @@
 		<p>Completed</p>
 	{/if}
 <h2>Progress</h2>
-<p>{total-count}/{total}. {((total-count)/total*100).toFixed(2)}%.</p>
+<p>{total - count}/{total}. {((total - count)/total*100).toFixed(2)}%.</p>
 <input bind:value={pw} />
 
 <style>

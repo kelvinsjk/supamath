@@ -1,0 +1,34 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model question {
+  id    String @id
+  year  Int
+  paper Int
+  qn    Int
+}
+
+model v2022p1q1 {
+  id      String @id
+  a       Int
+  b       Int
+  x1      Int
+  y1      Int
+  x2      Int
+  y2      Int
+  x3      Int
+  y3      Int
+  b2      Int
+  checked Boolean @default(false)
+  flagged Boolean @default(false)
+  og      Boolean @default(false)
+}

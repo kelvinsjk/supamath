@@ -54,9 +54,11 @@
 		const [factor1, factor2, roots] = factorizeQuadratic(num3);
 		const exp4 = `\\frac{${handleFactors(factor1, factor2)}}{${den}}`;
 
+		const signGen = isNegative ? signCase*-1 : signCase;
+
 		//// generate answer
 		const ans = generateInequalitiesAnswer(new Fraction(b,a),c,d,signCase*a);
-		const ansGen = generateInequalitiesAnswer(roots[0], roots[1], d, signCase*a);
+		const ansGen = generateInequalitiesAnswer(roots[0], roots[1], d, signGen);
 
 		//// generate solution
 		let soln = `${alignStar(`\\frac{${numQn}}{${den}} &${sign} ${rhs}

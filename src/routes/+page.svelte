@@ -1,115 +1,81 @@
 <script lang="ts">
-	import { math, align, alignStar, gatherStar, equation } from 'mathlifier';
-	import { Complex, Expression, Term } from 'mathlify';
+	import { math, align, alignStar, gatherStar, equation, display } from 'mathlifier';
+	import { Complex, Expression, Fraction, Polynomial, Term, factorizeQuadratic } from 'mathlify';
 	
 	import type { PageData } from './$types';
 	import { invalidateAll } from '$app/navigation';
 	export let data: PageData;
 	let pw = '';
 
-	type Variables = {a: number, b: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, b2: number, id: string};
+	import type { v_inequalities_example } from '@prisma/client';
 
 	let {vars, count, total} = data;
 	let qn: string, ans: string, ansGen: string, soln: string;
 	let qnToShow = vars !== null;
 	let i = 0;
-	let varRow: Variables;
+	let varRow: v_inequalities_example;
 	if (qnToShow && vars){
 		varRow = vars[i];
 		[qn, ans, ansGen, soln] = qnGen(varRow);
 	}
 
-	function qnGen(vars: Variables): [string, string, string, string] {
-		const {a,b,x1,y1,x2,y2,x3,y3,b2} = vars;
+	function qnGen(vars: v_inequalities_example): [string, string, string, string] {
+		const {a,b,c,d,B,signCase} = vars;
 		
-		// a i z   + bw     = c1
-		// alpha z + b2 i w = c2
+		// (Cx + D) / (x-d) sign B - ax
 
-		//// set up a_s, b_s
-		// a1 z + b1 w = c1
-		const a1 = new Complex(0, a);
-		const b1 = new Complex(b);
-		//const c1 = new Complex(-1);
-		const a2 = new Complex(x3, y3);
-		const b2i = new Complex(0, b2);
-		//const c2 = new Complex(6);
+		// C = B + ad - b - ac
+		// D = bc - Bd
+		const C = B + a*d - b - a*c;
+		const D = b*c - B*d;
+		const sign = signCase === 1 ? '>' : '<';
+		const numQn = new Polynomial([C, D]);
+		const den = new Polynomial([1, -d]);
+		const rhs = new Polynomial([B, -a], {ascending: true});
 
-		//// answers
-		const z = new Complex(x1, y1);
-		const w = new Complex(x2, y2);
-
-		//// generate c1, c2
-		const c1 = a1.times(z).plus(b1.times(w));
-		const c2 = a2.times(z).plus(b2i.times(w));
 
 		//// generate question
-		function sign(x: number): string {
-			return x < 0 ? '' : '+';
-		}
-		const lhs1 = new Expression(new Term(a, '\\mathrm{i} z'), new Term(b, 'w'));
-		const lhs2 = new Expression(`(${a2}) z`, new Term(b2, '\\mathrm{i} w'));
-		const qn = `${alignStar(`${lhs1} &= ${c1}
-			\\\\ ${lhs2} &= ${c2}
-		`)}`
+		const qn = `${display(`\\frac{${numQn}}{${den}} ${sign} ${rhs}`)}`
 
 		//// solve question
-		// make w subject
-		// w = (c1 - a1 z)/b1
-		// w = d1 + e1 z
-		const d1 = c1.divide(b1);
-		const e1 = a1.negative().divide(b1);
-		// sub in
-		const zCoeff = a2.plus(e1.times(b2i));
-		const rhs = c2.minus(d1.times(b2i));
-		const zAns = rhs.divide(zCoeff);
-		const wAns = d1.plus(e1.times(z));
+		// move rhs over: -B + ax
+		const exp1 = new Expression(`\\frac{${numQn}}{${den}}`, -B, new Term(a, 'x'));
+		// combine fraction
+		const negBPlusAx = new Polynomial([-B, a], {ascending: true});
+		const exp2 = `\\frac{${numQn} + (${negBPlusAx})(${den})}{${den}}`;
+		// expand and simplify
+		const num3 = numQn.plus(negBPlusAx.times(den));
+		const exp3 = `\\frac{${num3}}{${den}}`;
+		// if negative, multiply by -1
+		const isNegative = num3.coeffs[num3.coeffs.length-1].isLessThan(0);
+		const newSign = isNegative ? toggleSign(sign) : sign;
+		const exp3a = isNegative ? `\\\\ \\frac{${num3.negative()}}{${den}} &${newSign} 0` : '';
+		// factorize
+		const [factor1, factor2, roots] = factorizeQuadratic(num3);
+		const exp4 = `\\frac{${handleFactors(factor1, factor2)}}{${den}}`;
 
-		//const body = `${math(`z=${zAns},`)} ${math(`w=${wAns}.`)}`;
-		const ans = `${math(`z=${zAns},`)} ${math(`w=${wAns}.`)}`;
-		const ansGen = `${math(`z=${z},`)} ${math(`w=${w}.`)}`
+		//// generate answer
+		const ans = generateInequalitiesAnswer(new Fraction(b,a),c,d,signCase*a);
+		const ansGen = generateInequalitiesAnswer(roots[0], roots[1], d, signCase*a);
 
-		// solution
-		const wNum = new Expression(c1.real, new Term(-a, '\\mathrm{i} z'))
-		const wExp = `\\frac{${wNum}}{${b1}}`;
-		const lhs = a2.times(2).plus(1);
-		//const i = `\\mathrm{i}`;
-
-		// working params
-		const num = rhs.times(2);
-		const den = lhs;
-		const expanded = new Expression(num.real.times(den.real), new Term(num.real.times(den.imag.negative()), 'i'), new Term(num.imag.times(den.real), '\\mathrm{i} '), new Term(num.imag.times(den.imag.negative()), '\\mathrm{i}^2'));
-		const expanded2 = new Expression(c1.real, new Term(a, -1, 'i', zAns.real), new Term(a, -1, zAns.imag, '\\mathrm{i}^2'));
-
-
-		let soln = `${align(`${lhs1} &= ${c1}
-				\\\\ ${lhs2} &= ${c2}
-			`)}
-			From ${math(`(1),`)}
-		`;
-		soln += `${equation(`w = \\frac{${wNum}}{${b1}}`)}
-			Substituting ${math(`(3)`)} into ${math(`(2),`)}
-			${gatherStar(`(${a2})z ${sign(b2)} ${b2i} \\left( ${wExp} \\right) = ${c2} \\\\
-				(${a2.times(2)})z ${sign(b2)} ${b2i} ( -1 - \\mathrm{i} z )   = 12 \\\\
-				(${a2.times(2)})z ${sign(-b2)} ${b2i.negative()}  + z                     = 12 \\\\
-				(${a2.times(2).plus(1)})z                          = ${rhs.times(2)}
-			`)}
-			${alignStar(` z &= \\frac{${num}}{${den}} \\times \\frac{${den.conjugate()}}{${den.conjugate()}} \\\\
-				&= \\frac{${expanded}}{${den.real.abs()}^2 + ${den.imag.abs()}^2} \\\\
-				&= ${zAns} \\; \\blacksquare
-			`)}
-			${/* w = (c1 - a1 z)/b1 */''}
-			${alignStar(`w &= \\frac{${c1} ${sign(-a)} ${a1.negative()}(${z})}{${b1}} \\\\
-				&= \\frac{${expanded2}}{2} \\\\
-				&= ${w} \\; \\blacksquare
+		//// generate solution
+		let soln = `${alignStar(`\\frac{${numQn}}{${den}} &${sign} ${rhs}
+				\\\\ ${exp1} &${sign} 0
+				\\\\ ${exp2} &${sign} 0
+				\\\\ ${exp3} &${sign} 0
+				${exp3a}
+				\\\\ ${exp4} &${newSign} 0
 			`)}
 		`;
+		// TODO: number line
+		soln += generateInequalitiesAnswer(roots[0], roots[1], d, signCase*a);
 		return [qn, ans, ansGen, soln];
 	}
 
 	async function put(outcome: string) {
 		try {
 			const {id} = varRow;
-			const response = await fetch(`/api/v2022p1q01/${id}`, {
+			const response = await fetch(`/api/v_inequalities_example/${id}`, {
 				method: 'PATCH',
 				headers: {
 					"Content-Type": "application/json"
@@ -137,6 +103,28 @@
 		} catch(error){
 			console.log(error)
 		}
+	}
+
+	// solve (x-a)(x-b)(x-c) sign 0
+	// where sign===1 means '>'
+	function generateInequalitiesAnswer(a: number|Fraction, b: number|Fraction, c:number|Fraction, signCase: number): string {
+		const roots = [a,b,c].sort((a,b)=>a.valueOf()-b.valueOf());
+		return signCase===1 ?
+			`${math(`${roots[0]} < x < ${roots[1]}`)} <span class="mx-4 inline-block">or</span> ${math(`x > ${roots[2]}`)}` :
+			`${math(`x < ${roots[0]}`)} <span class="mx-4 inline-block">or</span> ${math(`${roots[1]} < x < ${roots[2]}`)}`;
+	}
+
+	function toggleSign(sign: string): string {
+		return sign === '>' ? '<' : '>';
+	}
+
+	function factorBrackets(factor: string): string {
+		return factor.length===1 ? factor : `(${factor})`;
+	}
+	function handleFactors(factor1: Polynomial, factor2: Polynomial) {
+		const f1 = `${factor1}`;
+		const f2 = `${factor2}`;
+		return f2.length===1 ? `${factorBrackets(f2)}${factorBrackets(f1)}` : `${factorBrackets(f1)}${factorBrackets(f2)}`;
 	}
 </script>
 
@@ -167,6 +155,10 @@
 <h2>Progress</h2>
 <p>{total - count}/{total}. {((total - count)/total*100).toFixed(2)}%.</p>
 <input bind:value={pw} />
+<div>
+	{JSON.stringify(varRow)}
+</div>
+
 
 <style>
 	.approve {
@@ -179,5 +171,10 @@
 	.approve {
 		display: flex;
 		justify-content: space-between;
+	}
+	:global(.mx-4.inline-block) {
+		display: inline-block;
+		margin-left: 1em;
+		margin-right: 1em;
 	}
 </style>

@@ -7,77 +7,24 @@
 	export let data: PageData;
 	let pw = '';
 
-	import type { v_inequalities_example } from '@prisma/client';
+	import type { v_inequalities_010102 } from '@prisma/client';
+	import { qnGen } from '$lib/qns/q010102';
 
 	let {vars, count, total} = data;
 	let qn: string, ans: string, ansGen: string, soln: string;
 	let qnToShow = vars !== null;
 	let i = 0;
-	let varRow: v_inequalities_example;
+	let varRow: v_inequalities_010102;
 	if (qnToShow && vars){
 		varRow = vars[i];
 		[qn, ans, ansGen, soln] = qnGen(varRow);
 	}
-
-	function qnGen(vars: v_inequalities_example): [string, string, string, string] {
-		const {a,b,c,d,B,signCase} = vars;
-		
-		// (Cx + D) / (x-d) sign B - ax
-
-		// C = B + ad - b - ac
-		// D = bc - Bd
-		const C = B + a*d - b - a*c;
-		const D = b*c - B*d;
-		const sign = signCase === 1 ? '>' : '<';
-		const numQn = new Polynomial([C, D]);
-		const den = new Polynomial([1, -d]);
-		const rhs = new Polynomial([B, -a], {ascending: true});
-
-
-		//// generate question
-		const qn = `${display(`\\frac{${numQn}}{${den}} ${sign} ${rhs}`)}`
-
-		//// solve question
-		// move rhs over: -B + ax
-		const exp1 = new Expression(`\\frac{${numQn}}{${den}}`, -B, new Term(a, 'x'));
-		// combine fraction
-		const negBPlusAx = new Polynomial([-B, a], {ascending: true});
-		const exp2 = `\\frac{${numQn} + (${negBPlusAx})(${den})}{${den}}`;
-		// expand and simplify
-		const num3 = numQn.plus(negBPlusAx.times(den));
-		const exp3 = `\\frac{${num3}}{${den}}`;
-		// if negative, multiply by -1
-		const isNegative = num3.coeffs[num3.coeffs.length-1].isLessThan(0);
-		const newSign = isNegative ? toggleSign(sign) : sign;
-		const exp3a = isNegative ? `\\\\ \\frac{${num3.negative()}}{${den}} &${newSign} 0` : '';
-		// factorize
-		const [factor1, factor2, roots] = factorizeQuadratic(num3);
-		const exp4 = `\\frac{${handleFactors(factor1, factor2)}}{${den}}`;
-
-		const signGen = isNegative ? signCase*-1 : signCase;
-
-		//// generate answer
-		const ans = generateInequalitiesAnswer(new Fraction(b,a),c,d,signCase*a);
-		const ansGen = generateInequalitiesAnswer(roots[0], roots[1], d, signGen);
-
-		//// generate solution
-		let soln = `${alignStar(`\\frac{${numQn}}{${den}} &${sign} ${rhs}
-				\\\\ ${exp1} &${sign} 0
-				\\\\ ${exp2} &${sign} 0
-				\\\\ ${exp3} &${sign} 0
-				${exp3a}
-				\\\\ ${exp4} &${newSign} 0
-			`)}
-		`;
-		// TODO: number line
-		soln += generateInequalitiesAnswer(roots[0], roots[1], d, signCase*a);
-		return [qn, ans, ansGen, soln];
-	}
-
+	
 	async function put(outcome: string) {
 		try {
 			const {id} = varRow;
-			const response = await fetch(`/api/v_inequalities_example/${id}`, {
+			console.log(id);
+			const response = await fetch(`/api/v_inequalities_010102/${id}`, {
 				method: 'PATCH',
 				headers: {
 					"Content-Type": "application/json"
@@ -107,27 +54,6 @@
 		}
 	}
 
-	// solve (x-a)(x-b)(x-c) sign 0
-	// where sign===1 means '>'
-	function generateInequalitiesAnswer(a: number|Fraction, b: number|Fraction, c:number|Fraction, signCase: number): string {
-		const roots = [a,b,c].sort((a,b)=>a.valueOf()-b.valueOf());
-		return signCase===1 ?
-			`${math(`${roots[0]} < x < ${roots[1]}`)} <span class="mx-4 inline-block">or</span> ${math(`x > ${roots[2]}`)}` :
-			`${math(`x < ${roots[0]}`)} <span class="mx-4 inline-block">or</span> ${math(`${roots[1]} < x < ${roots[2]}`)}`;
-	}
-
-	function toggleSign(sign: string): string {
-		return sign === '>' ? '<' : '>';
-	}
-
-	function factorBrackets(factor: string): string {
-		return factor.length===1 ? factor : `(${factor})`;
-	}
-	function handleFactors(factor1: Polynomial, factor2: Polynomial) {
-		const f1 = `${factor1}`;
-		const f2 = `${factor2}`;
-		return f2.length===1 ? `${factorBrackets(f2)}${factorBrackets(f1)}` : `${factorBrackets(f1)}${factorBrackets(f2)}`;
-	}
 </script>
 
 {#if qnToShow}

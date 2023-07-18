@@ -14,7 +14,7 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
 			if (outcome === 'flagged') {
 				data.flagged = true;
 			}
-			const updatedVars = await prisma.v_inequalities_example.update({
+			const updatedVars = await prisma.v_inequalities_010102.update({
 				where: { id },
 				data,
 			});

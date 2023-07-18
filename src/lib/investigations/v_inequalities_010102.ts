@@ -1,10 +1,8 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-import { generateID } from './generateID';
+import type { v_inequalities_010102 } from '@prisma/client';
+import { generateID } from '../../../prisma/generateID';
 import { gcd } from 'mathlify';
 
-const client = new PrismaClient();
-
-const vars: Prisma.v_inequalities_010102CreateInput[] = [];
+const vars: v_inequalities_010102[] = [];
 
 let idx = 0;
 for (const { b } of generateB()) {
@@ -20,17 +18,13 @@ for (const { b } of generateB()) {
 					signCase,
 					id: generateID(b, c, d, e, signCase),
 					idx,
+					checked: false,
+					flagged: false,
 				});
 			}
 		}
 	}
 }
-
-const main = async () => {
-	await Promise.all(vars.map((v) => client.v_inequalities_010102.create({ data: v })));
-};
-
-main();
 
 function generateB(): { b: number }[] {
 	// plus/minus 1 to 8
@@ -68,3 +62,6 @@ function generateDE(): { d: number; e: number }[] {
 function generateSign(): { signCase: number }[] {
 	return [{ signCase: -1 }, { signCase: 1 }];
 }
+
+import fs from 'fs';
+fs.writeFileSync(`./src/lib/investigations/jsons/v_inequalities_010102.json`, JSON.stringify(vars));

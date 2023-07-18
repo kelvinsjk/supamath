@@ -26,6 +26,9 @@ for (const { c, d } of generateCD()) {
 	}
 }
 
+console.log(`Generated ${vars.length} variables.`)
+
+
 const main = async () => {
 	await Promise.all(vars.map((v) => client.v_inequalities_example.create({ data: v })));
 };
@@ -45,14 +48,16 @@ function generateCD(): { c: number; d: number }[] {
 	return cdArray;
 }
 function generateAB(c: number, d: number): { a: number; b: number }[] {
-	// a: 1-2, b: 1-3, permuted with (+,+), (+,-), (-,+) where b/a \neq c or d 
+	// a: 1, b: 1-3
+	// a: 2, b: 1,3
+	// all permuted with (+,+), (+,-), (-,+) where b/a \neq c or d 
 	const abArray: { a: number; b: number }[] = [];
 	for (let i = 1; i < 4; i++) { // b
 		for (let j = 1; j < 2; j++) { // a
 			for (let k = 0; k < 3; k++) { // sign
 				const a = k===2 ? -j : j;
 				const b = k===1 ? -i : i;
-				if (b/a !== c && b/a !== d) {
+				if (b/a !== c && b/a !== d && (a===1 || b%a !== 0)) {
 					abArray.push({ a, b });
 				}
 			}

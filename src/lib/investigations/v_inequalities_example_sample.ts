@@ -39,12 +39,14 @@ for (const { c, d } of generateCD()) {
 
 console.log(exceptionIDs.length, vars.length, max, exceptionIDs.length/vars.length);
 
-/**
- * save exceptionArray to JSON file
- */
+// shuffle vars with Fisher-Yates algorithm
+for (let i = vars.length - 1; i > 0; i--) {
+	const j = Math.floor(Math.random() * (i + 1));
+	[vars[i], vars[j]] = [vars[j], vars[i]];
+}
+const var500 = vars.slice(0, 500).map((v)=>{return {a: v.a, b: v.b, c: v.c, d: v.d, B: v.B, signCase: v.signCase, id: v.id}});
 import fs from 'fs';
-fs.writeFileSync(`./src/lib/investigations/jsons/v_inequalities_example.json`, JSON.stringify(vars));
-fs.writeFileSync(`./src/lib/investigations/jsons/v_inequalities_exampleExceptions.json`, JSON.stringify(exceptionIDs));
+fs.writeFileSync(`./src/lib/investigations/jsons/v_inequalities_example_500.json`, JSON.stringify(var500));
 
 function generateCD(): { c: number; d: number }[] {
 	// unique integers from -3 to 3

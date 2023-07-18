@@ -49,3 +49,31 @@ model v_inequalities_010102 {
 	checked		Boolean @default(false)
 	flagged		Boolean @default(false)
 }
+
+model v_eqns_010201a {
+	id				String @id
+	x1 				Int
+	x2 				Int
+	a 				Int
+	b 				Int
+	c 				Int
+	idx				Int @unique
+	checked		Boolean @default(false)
+	flagged		Boolean @default(false)
+}
+
+model v_eqns_010201b {
+	id				String @id
+	a1 				Int
+	b1 				Int
+	c1 				Int
+	a2 				Int
+	b2 				Int
+	c2 				Int
+	x1 				Int
+	x2 				Int
+	x3 				Int
+	idx				Int @unique
+	checked		Boolean @default(false)
+	flagged		Boolean @default(false)
+}

@@ -7,14 +7,14 @@
 	export let data: PageData;
 	let pw = '';
 
-	import type { v_eqns_010201a } from '@prisma/client';
-	import { qnGen } from '$lib/qns/q010201a';
+	import type { v_inequalities_010102 } from '@prisma/client';
+	import { qnGen } from '$lib/qns/q010102';
 
 	let {vars, count, total} = data;
 	let qn: string, ans: string, ansGen: string, soln: string;
 	let qnToShow = vars !== null;
 	let i = 0;
-	let varRow: v_eqns_010201a;
+	let varRow: v_inequalities_010102;
 	if (qnToShow && vars){
 		varRow = vars[i];
 		[qn, ans, ansGen, soln] = qnGen(varRow);
@@ -24,7 +24,7 @@
 		try {
 			const {id} = varRow;
 			console.log(id);
-			const response = await fetch(`/api/v_eqns_010201a/${id}`, {
+			const response = await fetch(`/api/v_inequalities_010102/${id}`, {
 				method: 'PATCH',
 				headers: {
 					"Content-Type": "application/json"

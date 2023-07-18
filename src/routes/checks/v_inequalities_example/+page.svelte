@@ -51,7 +51,8 @@
 		const newSign = isNegative ? toggleSign(sign) : sign;
 		const exp3a = isNegative ? `\\\\ \\frac{${num3.negative()}}{${den}} &${newSign} 0` : '';
 		// factorize
-		const [factor1, factor2, roots] = factorizeQuadratic(num3);
+		const num4 = isNegative ? num3.negative() : num3;
+		const [factor1, factor2, roots] = factorizeQuadratic(num4);
 		const exp4 = `\\frac{${handleFactors(factor1, factor2)}}{${den}}`;
 
 		const signGen = isNegative ? signCase*-1 : signCase;

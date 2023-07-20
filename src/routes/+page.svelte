@@ -8,9 +8,10 @@
 	let pw = '';
 
 	// CHANGE BELOW
-	import type { v_eqns_010201b as vType } from '@prisma/client';
-	const q = 'v_eqns_010201b';
-	import { qnGen } from '$lib/qns/q010201b';
+	import type { v_eqns_010202 as vType } from '@prisma/client';
+	const q = 'v_eqns_010202';
+	import { qnGen } from '$lib/qns/q010202';
+	import { onMount } from 'svelte';
 	// CHANGE ABOVE
 
 	let {vars, count, total} = data;
@@ -22,6 +23,7 @@
 		varRow = vars[i];
 		[qn, ans, ansGen, soln] = qnGen(varRow);
 	}
+	let calculator: any;
 	
 	async function put(outcome: string) {
 		try {
@@ -52,13 +54,36 @@
 						[qn, ans, ansGen, soln] = qnGen(varRow);
 					}
 				}
+				updateCalc();
 			}
 		} catch(error){
 			console.log(error)
 		}
 	}
 
+	onMount(()=>{
+		var elt = document.getElementById('calculator');
+  	calculator = Desmos.GraphingCalculator(elt);
+		updateCalc();
+	})
+
+	function updateCalc(): void {
+		calculator.setExpression({id:'graph1', latex: `y=\\ln (${varRow.a}x)`});
+		calculator.setExpression({id:'ineq', latex: `\\ln (${varRow.a}x) ${varRow.signCase===1 ? '>' : '<'} ${varRow.c}-${varRow.b}x`});
+		calculator.setExpression({id:'graph2', latex: `${varRow.c}-${varRow.b}x`});
+		calculator.setMathBounds({
+			left: -1,
+			right: 10,
+			bottom: -10,
+			top: 10
+		});
+	}
+
 </script>
+
+<svelte:head>
+	<script src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+</svelte:head>
 
 {#if qnToShow}
 	<h2>Question</h2>
@@ -77,6 +102,7 @@
 		<button on:click={()=>{put('checked')}}>Approve</button>
 		<button on:click={()=>{put('flagged')}}>Flag</button>
 	</div>
+	<div id="calculator" style="width: 375px; height: 600px;"></div>
 	<h2>Solution</h2>
 	<p>
 		{@html soln}

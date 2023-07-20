@@ -1,5 +1,5 @@
-import { Polynomial, Expression, Term, Fraction, completeSquare, solveLinear, cramers, cramersFrac } from 'mathlify';
-import { align, alignStar, display, equation, gatherStar, math, newParagraph, newline } from 'mathlifier';
+import { Expression, Term, Fraction, cramersFrac } from 'mathlify';
+import { display, equation, math, newParagraph, } from 'mathlifier';
 
 export function qnGen(vars: {
 	a1: number;
@@ -32,7 +32,7 @@ export function qnGen(vars: {
 		In December, the share prices of companies ${math(`A, B`)} and ${math(`C`)} are
 		${math(`${varToDollar(a2)}, ${varToDollar(b2)}`)}
 		and ${math(`${varToDollar(c2)}`)} per unit of share respectively. He sold all his shares
-		in December for a total ${profitString} of
+		in December for an overall ${profitString} of
 		${math(`\\$${Math.abs(profit)/2}.`)}
 		${newParagraph}
 		Determine how many units of shares Mr. Tan bought for each company.

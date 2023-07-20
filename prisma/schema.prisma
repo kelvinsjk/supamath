@@ -77,3 +77,14 @@ model v_eqns_010201b {
 	checked		Boolean @default(false)
 	flagged		Boolean @default(false)
 }
+
+model v_eqns_010202 {
+	id				String @id
+	a 				Int
+	b 				Int
+	c 				Int
+	signCase	Int
+	idx				Int @unique
+	checked		Boolean @default(false)
+	flagged		Boolean @default(false)
+}

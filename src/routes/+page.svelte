@@ -7,14 +7,17 @@
 	export let data: PageData;
 	let pw = '';
 
-	import type { v_eqns_010201a } from '@prisma/client';
-	import { qnGen } from '$lib/qns/q010201a';
+	// CHANGE BELOW
+	import type { v_eqns_010201b as vType } from '@prisma/client';
+	const q = 'v_eqns_010201b';
+	import { qnGen } from '$lib/qns/q010201b';
+	// CHANGE ABOVE
 
 	let {vars, count, total} = data;
 	let qn: string, ans: string, ansGen: string, soln: string;
 	let qnToShow = vars !== null;
 	let i = 0;
-	let varRow: v_eqns_010201a;
+	let varRow: vType;
 	if (qnToShow && vars){
 		varRow = vars[i];
 		[qn, ans, ansGen, soln] = qnGen(varRow);
@@ -24,7 +27,8 @@
 		try {
 			const {id} = varRow;
 			console.log(id);
-			const response = await fetch(`/api/v_eqns_010201a/${id}`, {
+			//CHANGE HERE 
+			const response = await fetch(`/api/${q}/${id}`, {
 				method: 'PATCH',
 				headers: {
 					"Content-Type": "application/json"

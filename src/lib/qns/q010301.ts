@@ -84,8 +84,8 @@ export function qnGen(vars: {
 	`;
 	
 
-	const ansGen = canTake ? math(`${y1Num.toFixed(2)} \\leq y \\leq ${y2Num.toFixed(2)}`)
+	let ansGen = canTake ? math(`${y1Num.toFixed(2)} \\leq y \\leq ${y2Num.toFixed(2)}`)
 	: math(`y < ${y1Num.toFixed(2)}`) + ' or ' + math(`y > ${y2Num.toFixed(2)}`)
-	+ newline + math(final);
+	ansGen += newline + math(final);
 	return [qn, ans, ansGen, soln];
 }

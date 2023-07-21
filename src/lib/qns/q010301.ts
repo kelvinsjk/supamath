@@ -55,17 +55,17 @@ export function qnGen(vars: {
 	const yPoly = yPolyNeg.negative().simplify();
 	const signOpp = canTake ? `\\leq` : `>`;
 	// solve for roots
-	const yRoots = solveQuadratic(yPolyNeg);
+	const yRoots = solveQuadratic(yPoly);
 	let y1: Fraction|Expression, y2: Fraction|Expression;
 	if (yRoots[2]==='frac'){
 		[y1,y2] = [yRoots[0], yRoots[1]];
 	} else {
-		[y1,y2] = solveQuadraticSurd(yPolyNeg)
+		[y1,y2] = solveQuadraticSurd(yPoly)
 	}
 	// numerical roots for ansGen check
 	const y1Num = yRoots[0].valueOf(), y2Num = yRoots[1].valueOf();
 	// final solution
-	const final = canTake ? `${y1} \\leq ${y2}` : `y < ${y1} \\; \\textrm{ or } \\; y > ${y2}`
+	const final = canTake ? `${y1} \\leq y \\leq ${y2}` : `y < ${y1} \\; \\textrm{ or } \\; y > ${y2}`
 
 	//! soln typesetting
 	const soln = `${gatherStar(` y = \\frac{${num}}{${den}}

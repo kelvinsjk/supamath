@@ -4,11 +4,12 @@
 	export let data: PageData;
 	let pw = '';
 
-	//! CHANGE BELOW
-	import type { v_eqns_010301 as vType } from '@prisma/client';
-	const q = 'v_eqns_010301';
-	import { qnGen } from '$lib/qns/q010301';
-	//! CHANGE ABOVE
+	// CHANGE BELOW
+	import type { v_eqns_010202 as vType } from '@prisma/client';
+	const q = 'v_eqns_010202';
+	import { qnGen } from '$lib/qns/q010202';
+	import { browser } from '$app/environment';
+	// CHANGE ABOVE
 
 	let {vars, count, total} = data;
 	let qn: string, ans: string, ansGen: string, soln: string;
@@ -19,6 +20,8 @@
 		varRow = vars[i];
 		[qn, ans, ansGen, soln] = qnGen(varRow);
 	}
+	let calculator: any;
+	let calcContainer: HTMLDivElement;
 	
 	async function put(outcome: string) {
 		try {
@@ -49,14 +52,46 @@
 						[qn, ans, ansGen, soln] = qnGen(varRow);
 					}
 				}
+				updateCalc();
 			}
 		} catch(error){
 			console.log(error)
 		}
 	}
 
+	function initCalc(): void {
+		if (browser){
+			// @ts-ignore
+			calculator = Desmos.GraphingCalculator(calcContainer, {keypad: false, expressions: false});
+			updateCalc();
+		}
+	}
+
+	function updateCalc(): void {
+		calculator.setExpression({id:'graph1', latex: `y=\\ln (${varRow.a}x)`});
+		calculator.setExpression({id:'inequality', latex: inequalityString(varRow.signCase) });
+		calculator.setExpression({id:'graph2', latex: `${varRow.c}-${varRow.b}x`});
+		calculator.setMathBounds({
+			left: -1,
+			right: 10,
+			bottom: -1,
+			top: 10
+		});
+	}
+
+	function inequalityString(signCase:number): string {
+		return signCase === 1
+			? `${varRow.c}-${varRow.b}x < y < \\ln (${varRow.a}x)`
+			: `\\ln (${varRow.a}x) < y < ${varRow.c}-${varRow.b}x`
+	}
 
 </script>
+
+{#if browser}
+	<script src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6" on:load={initCalc}></script>
+{/if}
+
+<button on:click={initCalc}>Click</button>
 
 {#if qnToShow}
 	<h2>Question</h2>
@@ -75,6 +110,7 @@
 		<button on:click={()=>{put('checked')}}>Approve</button>
 		<button on:click={()=>{put('flagged')}}>Flag</button>
 	</div>
+	<div id="calculator" bind:this={calcContainer}></div>
 	<h2>Solution</h2>
 	<p>
 		{@html soln}
@@ -110,5 +146,10 @@
 	.json {
 		overflow-x: scroll;
 		max-width: 350px;
+	}
+	#calculator {
+		width: 375px;
+		height: 375px;
+		margin-inline: auto;
 	}
 </style>

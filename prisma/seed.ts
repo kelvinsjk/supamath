@@ -1,87 +1,110 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import { generateID } from './generateID';
 import fs from 'node:fs';
-import { bisection } from 'mathlify';
+import { gcd, solveQuadratic } from 'mathlify';
 
 const client = new PrismaClient();
 
-const vars: Prisma.v_eqns_010202CreateInput[] = [];
+const vars: Prisma.v_eqns_010301CreateInput[] = [];
 
-const maxX = [0, 0], maxY = [0,0];
-const minX = [10, 10], minY = [10,10];
+let min = 0, max = 0, j = 0, k = 0;
+
+// (dx + e) / (x^2 + bx + c)
+// b^2 - 4c < 0 to ensure denominator is always positive
 
 let idx = 0;
-for (const { a, b } of generateAB()) {
-	for (const { c } of generateC(a,b)) {
-		for (const { signCase } of generateSign()) {
-			idx++;
-			vars.push({
-				a,
-				b,
-				c,
-				signCase,
-				id: generateID(a,b,c,signCase),
-				idx,
-			});
-			const x = bisection((x)=>Math.log(a*x)-c+b*x, 1/a, c/b);
-			const y = Math.log(a*x);
-			if (x > maxX[0]) {
-				maxX[0] = x;
-				maxX[1] = y;
-			}
-			if (x < minX[0]) {
-				minX[0] = x;
-				minX[1] = y;
-			}
-			if (y > maxY[1]) {
-				maxY[0] = x;
-				maxY[1] = y;
-			}
-			if (y < minY[1]) {
-				minY[0] = x;
-				minY[1] = y;
+for (const { c, d } of generateCD()) {
+	for (const { b } of generateB(c)) {
+		for (const {e} of generateE(d)){
+			for (const { canTake } of generateCanTake()) {
+				const algebraic = Math.random() < 0.5;
+				idx++;
+				vars.push({
+					b,
+					c,
+					d,
+					e,
+					canTake,
+					algebraic,
+					id: generateID(b,c,d,e,canTake,algebraic),
+					idx,
+				});
+				const A = b*b - 4*c;
+				const B = 4*e-2*b*d;
+				const C = d*d;
+				let [x1, x2, xType] = solveQuadratic([A,B,C]);
+				if (xType !== 'frac'){
+					k++;
+					// 84.1% of the time we have surd solutions
+				}
+				if (x1.valueOf() > x2.valueOf()) {
+					[x1, x2] = [x2, x1];
+				}
+				if (x1.valueOf() < min) {
+					min = x1.valueOf();
+				}
+				if (x2.valueOf() > max) {
+					max = x2.valueOf();
+				}
+				if (x1.valueOf()< -10 || x2.valueOf() > 10 ){
+					j++;
+				}
 			}
 		}
 	}
 }
 
-console.log(vars.length, minX, maxX, minY, maxY);
+console.log(vars.length, min, max, j, k, (k/vars.length).toPrecision(3));
 // shuffle vars with Fisher-Yates algorithm
 for (let i = vars.length - 1; i > 0; i--) {
 	const j = Math.floor(Math.random() * (i + 1));
 	[vars[i], vars[j]] = [vars[j], vars[i]];
 }
 const vars500 = vars.slice(0, 500);
-//fs.writeFileSync(`./src/lib/investigations/jsons/v_eqns_010202_500.json`, JSON.stringify(vars500));
-//fs.writeFileSync(`./src/lib/investigations/jsons/v_eqns_010202.json`, JSON.stringify(vars));
+fs.writeFileSync(`./src/lib/investigations/jsons/v_eqns_010301_500.json`, JSON.stringify(vars500));
+fs.writeFileSync(`./src/lib/investigations/jsons/v_eqns_010301.json`, JSON.stringify(vars));
 
 const main = async () => {
-	//await client.v_eqns_010202.createMany({data: vars500});
+	await client.v_eqns_010301.createMany({data: vars});
 };
 
 main();
 
-function generateAB(): { a: number, b: number }[] {
-	// a: 1-9
-	// b: 1-5
-	const abArray: { a: number, b: number }[] = [];
-	for (let a = 1; a < 10; a++) {
-		for (let b = 1; b < 6; b++) {
-			abArray.push({ a, b },);
+function generateCD(): { c: number, d: number }[] {
+	// c: 1-9
+	// d: 1-3
+	const cdArray: { c: number, d: number }[] = [];
+	for (let c = 1; c < 10; c++) {
+		for (let d = 1; d < 4; d++) {
+			cdArray.push({ c, d },{c, d:-d});
 		}
 	}
-	return abArray;
+	return cdArray;
 }
 
-function generateC(a: number, b: number): { c: number }[] {
-	// c from floor(b/a + 1) to 9
-	const cArray: { c: number }[] = [];
-	for (let c = Math.floor(b/a + 1); c < 10; c++) {
-		cArray.push({ c },);
+function generateB(c: number): { b: number }[] {
+	// b: 1 to min(9, sqrt(4c-1))
+	const bArray: { b: number }[] = [];
+	for (let b = 1; b < Math.min(10, Math.floor(Math.sqrt(4*c))); b++) {
+		bArray.push({ b }, {b: -b});
 	}
-	return cArray;
+	return bArray;
 }
 
-function generateSign(): { signCase: number }[] {
-	return [{ signCase: -1 }, { signCase: 1 }];
+function generateE(d: number): { e: number }[] {
+	// e: 1 to 9
+	const eArray: { e: number }[] = [];
+	for (let e = 1; e < 10; e++) {
+		if (gcd(e,d) !==1){
+			eArray.push({e});
+			if (d > 0){
+				eArray.push({e:-e});
+			}
+		}
+	}
+	return eArray;
+}
+
+function generateCanTake(): { canTake: boolean }[] {
+	return [{ canTake: true }, { canTake: false }];
 }

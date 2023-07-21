@@ -88,3 +88,16 @@ model v_eqns_010202 {
 	checked		Boolean @default(false)
 	flagged		Boolean @default(false)
 }
+
+model v_eqns_010301 {
+	id				String @id
+	b 				Int
+	c 				Int
+	d 				Int
+	e 				Int
+	canTake		Boolean
+	algebraic Boolean
+	idx				Int @unique
+	checked		Boolean @default(false)
+	flagged		Boolean @default(false)
+}

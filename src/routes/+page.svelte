@@ -8,7 +8,6 @@
 	import type { v_eqns_010202 as vType } from '@prisma/client';
 	const q = 'v_eqns_010202';
 	import { qnGen } from '$lib/qns/q010202';
-	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	// CHANGE ABOVE
 
@@ -60,31 +59,39 @@
 		}
 	}
 
-	onMount(()=>{
+	function initCalc(): void {
 		if (browser){
 			// @ts-ignore
 			calculator = Desmos.GraphingCalculator(calcContainer, {keypad: false, expressions: false});
 			updateCalc();
 		}
-	})
+	}
 
 	function updateCalc(): void {
 		calculator.setExpression({id:'graph1', latex: `y=\\ln (${varRow.a}x)`});
-		calculator.setExpression({id:'inequality', latex: `\\ln (${varRow.a}x) ${varRow.signCase===1 ? '>' : '<'} ${varRow.c}-${varRow.b}x`});
+		calculator.setExpression({id:'inequality', latex: inequalityString(varRow.signCase) });
 		calculator.setExpression({id:'graph2', latex: `${varRow.c}-${varRow.b}x`});
 		calculator.setMathBounds({
 			left: -1,
 			right: 10,
-			bottom: -10,
+			bottom: -1,
 			top: 10
 		});
 	}
 
+	function inequalityString(signCase:number): string {
+		return signCase === 1
+			? `${varRow.c}-${varRow.b}x < y < \\ln (${varRow.a}x)`
+			: `\\ln (${varRow.a}x) < y < ${varRow.c}-${varRow.b}x`
+	}
+
 </script>
 
-<svelte:head>
-	<script src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
-</svelte:head>
+{#if browser}
+	<script src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6" on:load={initCalc}></script>
+{/if}
+
+<button on:click={initCalc}>Click</button>
 
 {#if qnToShow}
 	<h2>Question</h2>

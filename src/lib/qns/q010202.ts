@@ -21,7 +21,8 @@ export function qnGen(vars: {
 	`;
 
 	//! solve question
-	const ans = signCase < 0 ? `0 < x < ${x.toPrecision(3)}` : `x > ${x.toPrecision(3)}`;
+	const ansString = signCase < 0 ? `0 < x < ${x.toPrecision(3)}` : `x > ${x.toPrecision(3)}`;
+	const ans = math(ansString);
 	const ansGen = ans;
 
 	//! generate solution

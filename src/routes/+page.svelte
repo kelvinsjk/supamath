@@ -1,7 +1,4 @@
-<script lang="ts">
-	import { math, align, alignStar, gatherStar, equation, display } from 'mathlifier';
-	import { Complex, Expression, Fraction, Polynomial, Term, factorizeQuadratic } from 'mathlify';
-	
+<script lang="ts">	
 	import type { PageData } from './$types';
 	import { invalidateAll } from '$app/navigation';
 	export let data: PageData;
@@ -12,6 +9,7 @@
 	const q = 'v_eqns_010202';
 	import { qnGen } from '$lib/qns/q010202';
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	// CHANGE ABOVE
 
 	let {vars, count, total} = data;
@@ -24,6 +22,7 @@
 		[qn, ans, ansGen, soln] = qnGen(varRow);
 	}
 	let calculator: any;
+	let calcContainer: HTMLDivElement;
 	
 	async function put(outcome: string) {
 		try {
@@ -62,14 +61,16 @@
 	}
 
 	onMount(()=>{
-		var elt = document.getElementById('calculator');
-  	calculator = Desmos.GraphingCalculator(elt);
-		updateCalc();
+		if (browser){
+			// @ts-ignore
+			calculator = Desmos.GraphingCalculator(calcContainer, {keypad: false, expressions: false});
+			updateCalc();
+		}
 	})
 
 	function updateCalc(): void {
 		calculator.setExpression({id:'graph1', latex: `y=\\ln (${varRow.a}x)`});
-		calculator.setExpression({id:'ineq', latex: `\\ln (${varRow.a}x) ${varRow.signCase===1 ? '>' : '<'} ${varRow.c}-${varRow.b}x`});
+		calculator.setExpression({id:'inequality', latex: `\\ln (${varRow.a}x) ${varRow.signCase===1 ? '>' : '<'} ${varRow.c}-${varRow.b}x`});
 		calculator.setExpression({id:'graph2', latex: `${varRow.c}-${varRow.b}x`});
 		calculator.setMathBounds({
 			left: -1,
@@ -102,7 +103,7 @@
 		<button on:click={()=>{put('checked')}}>Approve</button>
 		<button on:click={()=>{put('flagged')}}>Flag</button>
 	</div>
-	<div id="calculator" style="width: 375px; height: 600px;"></div>
+	<div id="calculator" bind:this={calcContainer}></div>
 	<h2>Solution</h2>
 	<p>
 		{@html soln}
@@ -138,5 +139,10 @@
 	.json {
 		overflow-x: scroll;
 		max-width: 350px;
+	}
+	#calculator {
+		width: 375px;
+		height: 375px;
+		margin-inline: auto;
 	}
 </style>

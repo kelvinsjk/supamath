@@ -1,5 +1,5 @@
-import { Expression, Term, Fraction, cramersFrac, Polynomial, bisection } from 'mathlify';
-import { display, equation, math, newParagraph, } from 'mathlifier';
+import { Polynomial, bisection } from 'mathlify';
+import { display, math, } from 'mathlifier';
 
 export function qnGen(vars: {
 	a: number;

@@ -8,6 +8,7 @@ export const load = (async () => {
 		prisma.v_eqns_010202.findMany({
 			where: { checked: false, flagged: false },
 			//where: { og: true },
+			where: { id: 'id1121truetrue'},
 			take: 50,
 		}),
 	]);

@@ -1,4 +1,4 @@
 export function generateID(...args: (string|number|boolean)[]): string {
-  args.map((x)=>typeof x === 'boolean' ? x ? 'T' : 'F' : x )
+  args = args.map((x)=>(typeof x === 'boolean') ? (x ? 'T' : 'F') : x )
   return `id${args.join('')}`
 }

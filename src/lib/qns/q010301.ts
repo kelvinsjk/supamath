@@ -1,5 +1,5 @@
-import { Polynomial, Expression, Term, solveQuadratic, type Fraction, solveQuadraticSurd } from 'mathlify';
-import { display, math, gatherStar, newline } from 'mathlifier';
+import { Polynomial, Expression, Term, solveQuadratic, type Fraction, solveQuadraticSurd, factorizeQuadratic } from 'mathlify';
+import { display, math, gatherStar, newline, alignStar, newParagraph } from 'mathlifier';
 
 export function qnGen(vars: {
 	b: number;
@@ -54,13 +54,51 @@ export function qnGen(vars: {
 	const yPolyNeg = byMinusD.square().minus(cyMinusE.times(new Polynomial(4)));
 	const yPoly = yPolyNeg.negative().simplify();
 	const signOpp = canTake ? `\\leq` : `>`;
-	// solve for roots
+
+	//! first part of soln
+	let soln = `${gatherStar(` y = \\frac{${num}}{${den}}
+			\\\\ ${lhs1} = ${num}
+			\\\\ ${lhs2} = 0
+		`)}
+		For the range of values that ${math(`y`)} ${canTakeString} take,
+		the discriminant
+		${display(`b^2 - 4ac ${sign} 0`)}
+	`;
+
+	//! solve for roots: extra working if surds detected
 	const yRoots = solveQuadratic(yPoly);
 	let y1: Fraction|Expression, y2: Fraction|Expression;
 	if (yRoots[2]==='frac'){
+		const [factor1, factor2] = factorizeQuadratic(yPoly);
 		[y1,y2] = [yRoots[0], yRoots[1]];
+		soln += `${gatherStar(` ${lhs3} ${sign} 0
+				\\\\ ${yPolyNeg} ${sign} 0
+				\\\\ ${yPoly} ${signOpp} 0
+				\\\\ (${factor1})(${factor2}) ${signOpp} 0
+			`)
+		}`		
 	} else {
-		[y1,y2] = solveQuadraticSurd(yPoly)
+		soln += `${gatherStar(` ${lhs3} ${sign} 0
+				\\\\ ${yPolyNeg} ${sign} 0
+				\\\\ ${yPoly} ${signOpp} 0
+			`)}
+		`;
+		[y1,y2] = solveQuadraticSurd(yPoly);
+		if (yPoly.coeffs[1].isEqualTo(0)){
+			soln += `The roots to the equation ${math(`${yPoly} = 0`)}
+				are ${math(`\\pm ${y2}`)}
+				${newParagraph}
+			`;
+		} else {
+			const [C,B,A] = yPoly.coeffs;
+			const BBracket = B.isGreaterThan(0) ? `${B}` : `(${B})`;
+			soln += `The roots to the equation ${math(`${yPoly} = 0`)}
+				are ${alignStar(`y &= \\frac{-${BBracket} \\pm \\sqrt{ ${B}^2 - 4(${A})(${C}) }}{2(${A})}
+					\\\\ &= ${y1} \\; \\textrm{ or }\\;  ${y2}
+				`)}
+				${newParagraph}
+			`;
+		}
 	}
 	// numerical roots for ansGen check
 	const y1Num = yRoots[0].valueOf(), y2Num = yRoots[1].valueOf();
@@ -68,18 +106,7 @@ export function qnGen(vars: {
 	const final = canTake ? `${y1} \\leq y \\leq ${y2}` : `y < ${y1} \\; \\textrm{ or } \\; y > ${y2}`
 
 	//! soln typesetting
-	const soln = `${gatherStar(` y = \\frac{${num}}{${den}}
-			\\\\ ${lhs1} = ${num}
-			\\\\ ${lhs2} = 0
-		`)}
-		For the range of values that ${math(`y`)} ${canTakeString} take,
-		the discriminant
-		${display(`b^2 - 4ac ${sign} 0`)}
-		${gatherStar(` ${lhs3} ${sign} 0
-			\\\\ ${yPolyNeg} ${sign} 0
-			\\\\ ${yPoly} ${signOpp} 0
-		`)}
-		Hence the range of values that ${math(`y`)} can take is
+	soln += `Hence the range of values that ${math(`y`)} can take is
 		${display(`${final} \\; \\blacksquare`)}
 	`;
 	

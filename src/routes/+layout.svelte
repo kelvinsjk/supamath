@@ -11,4 +11,9 @@
     max-width: 500px;
     margin-inline: auto;
   }
+  :global(#calculator) {
+		width: 375px;
+		height: 375px;
+		margin-inline: auto;
+	}
 </style>

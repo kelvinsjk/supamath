@@ -101,3 +101,15 @@ model v_eqns_010301 {
 	checked		Boolean @default(false)
 	flagged		Boolean @default(false)
 }
+
+model v_eqns_010302 {
+	id				String @id
+	a 				Int
+	b 				Int
+	x1 				Int
+	x2 				Int
+	signCase	Int
+	idx				Int @unique
+	checked		Boolean @default(false)
+	flagged		Boolean @default(false)
+}

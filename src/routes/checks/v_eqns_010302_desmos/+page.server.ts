@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { prisma } from '$lib/prisma';
 
-const table = 'v_int_090101';
+const table = 'v_eqns_010302';
 
 export const load = (async () => {
 	const response = await prisma.$transaction([
@@ -10,6 +10,7 @@ export const load = (async () => {
 		prisma[table].findMany({
 			where: { 
 				checked: false, flagged: false,
+				//id: 'id1121truetrue'
 			},
 			//where: { og: true },
 			take: 50,

@@ -1,5 +1,5 @@
 import { Polynomial, solveLinear } from 'mathlify';
-import { display, math } from 'mathlifier';
+import { display, math, align } from 'mathlifier';
 
 export function qnGen(vars: {
 	a: number;
@@ -48,10 +48,10 @@ export function qnGen(vars: {
 	const ansGen = math(ansGenString);
 	
 	//! generate solution
-	
-
-	//! first part of soln
-	const soln = `
+	const soln = `At intersection points,
+		${align(`${axPlusB} &= ${cxPlusD}
+			\\\\ -(${axPlusB}) &= ${cxPlusD}
+		`)}
 	`;
 
 	return [qn, ans, ansGen, soln, [axPlusB.toString(), `y=${cxPlusD.toString()}`]];

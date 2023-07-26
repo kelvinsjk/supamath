@@ -26,6 +26,10 @@ for (const {case2} of [{case2: 0}, {case2: 1}, {case2: 2}]) {
 				idx++;
 				vars200.push({
 					case1: 0,
+					a1: 0,
+					b1: 0,
+					c1: 0,
+					signCase1: 0,
 					case2,
 					a2,
 					b2,
@@ -96,7 +100,7 @@ fs.writeFileSync(`./src/lib/investigations/jsons/${table}_500.json`, JSON.string
 //fs.writeFileSync(`./src/lib/investigations/jsons/${table}.json`, JSON.stringify(vars200));
 
 const main = async () => {
-	await client[table].createMany({ data: vars500 });
+	//await client[table].createMany({ data: vars500 });
 	//await client.v_eqns_010301.createMany({ data: vars });
 };
 

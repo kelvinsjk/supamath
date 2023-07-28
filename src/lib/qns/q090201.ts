@@ -36,19 +36,20 @@ export function qnGen(vars: {
 		const actualA2 = new Fraction(as[i],Math.pow(bs[i],2));
 		const actualA = new SquareRoot(actualA2);
 		if (i===0){ // arc tan
-			const xTerm = new Term(new Fraction(bs[i], Math.sqrt(as[i])), `x`);
-			console.log(`${actualA}`)
+			const rootA = new SquareRoot(as[i]);
+			const xTerm = new Term(rootA.reciprocal().times(bs[i]), `x`);
 			const ansTerm = new Term(actualA.reciprocal().divide(bs[i]*bs[i]), `\\tan^{-1} \\left( ${xTerm} \\right)`)
 			answers.push(math(`${ansTerm} + c`))
 		} else if (i===1){ // arc sin
-			const xTerm = new Term(new Fraction(bs[i], Math.sqrt(as[i])), `x`);
+			const rootA = new SquareRoot(as[i]);
+			const xTerm = new Term(rootA.reciprocal().times(bs[i]), `x`);
 			const ansTerm = new Term(new Fraction(1,bs[i]), `\\sin^{-1} \\left( ${xTerm} \\right)`)
 			answers.push(math(`${ansTerm} + c`))
 		} else { // ln
 			const aRoot = new SquareRoot(as[i]);
 			const numPoly = i===2 ? new Expression(new Term(bs[i], 'x'), aRoot.negative()) : new Expression(aRoot, new Term(bs[i], 'x'));
 			const denPoly = i===2 ? new Expression(new Term(bs[i], 'x'), aRoot) : new Expression(aRoot, new Term(-bs[i], 'x'));
-			const ansTerm = new Term(actualA.reciprocal().divide(bs[i]).divide(2), `\\ln \\left \\lvert \\frac{${numPoly}}{${denPoly}} \\right \\rvert`)
+			const ansTerm = new Term(actualA.reciprocal().divide(bs[i]*bs[i]).divide(2), `\\ln \\left \\lvert \\frac{${numPoly}}{${denPoly}} \\right \\rvert`)
 			answers.push(math(`${ansTerm} + c`))
 		}
 	}

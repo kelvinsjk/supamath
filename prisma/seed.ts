@@ -19,32 +19,36 @@ const vars: Prisma.v_int_090201CreateInput[] = [];
 
 // we first get 200 rows where we have 1/(x ln x)
 let idx = 0;
+let count = 0;
 for (const [a1,b1] of generateABs()) {
 	for (const [a2,b2] of generateABs()) {
 		for (const [a3,b3] of generateABs()) {
 			for (const [a4,b4] of generateABs()) {
-				idx++;
-				const swap1 = Math.random() < 0.5;
-				const permute = getRandomInt(0,23);
-				vars.push({
-					a1,
-					b1,
-					swap1,
-					a2,
-					b2,
-					a3,
-					b3,
-					a4,
-					b4,
-					permute,
-					idx,
-					id: generateID(a1,b1,swap1,a2,b2,a3,b3,a4,b4,permute)
-				})
+				count++;
+				if (bsValid(b1,b2,b3,b4)&&asValid(a1,a2,a3,a4)){
+					idx++;
+					const swap1 = Math.random() < 0.5;
+					const permute = getRandomInt(0,23);
+					vars.push({
+						a1,
+						b1,
+						swap1,
+						a2,
+						b2,
+						a3,
+						b3,
+						a4,
+						b4,
+						permute,
+						idx,
+						id: generateID(a1,b1,swap1,a2,b2,a3,b3,a4,b4,permute)
+					})
+				}
 			}
 		}
 	}
 }
-console.log(vars.length);
+console.log(vars.length, count);
 
 //! shuffle vars with Fisher-Yates algorithm
 //for (let i = vars.length - 1; i > 0; i--) {
@@ -93,3 +97,16 @@ function generateABs(): [number, number][] {
 	}
 	return abs;
 }
+
+function bsValid(b1: number, b2: number, b3: number, b4: number): boolean {
+	if (b1===1 && b2===1 && b3===1 && b4===1) return false;
+	if (b1!==1 && b2!==1 && b3!==1 && b4!==1) return false;
+	return true;
+}
+
+function asValid(a1: number, a2: number, a3: number, a4: number): boolean {
+	if (Number.isInteger(Math.sqrt(a1)) && Number.isInteger(Math.sqrt(a2)) && Number.isInteger(Math.sqrt(a3)) && Number.isInteger(Math.sqrt(a4))) return false; 
+	if (!Number.isInteger(Math.sqrt(a1)) && !Number.isInteger(Math.sqrt(a2)) && !Number.isInteger(Math.sqrt(a3)) && !Number.isInteger(Math.sqrt(a4))) return false;
+	return true;
+}
+

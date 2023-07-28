@@ -1,5 +1,5 @@
-import { Polynomial, solveLinear, Expression, Term, Fraction } from 'mathlify';
-import { display, math, align, newParagraph } from 'mathlifier';
+import { Polynomial, Expression, Term, Fraction } from 'mathlify';
+import { math, newParagraph } from 'mathlifier';
 
 export function qnGen(vars: {
 	case1: number;

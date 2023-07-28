@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { prisma } from '$lib/prisma';
 
-const table = 'v_int_090101';
+const table = 'v_int_090201';
 
 export const load = (async () => {
 	const response = await prisma.$transaction([

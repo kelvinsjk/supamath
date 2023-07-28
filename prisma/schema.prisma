@@ -134,3 +134,20 @@ model v_int_090101 {
 	checked		Boolean @default(false)
 	flagged		Boolean @default(false)
 }
+
+model v_int_090201 {
+	id				String @id
+	a1 				Int 
+	b1 				Int 
+	swap1			Boolean
+	a2 				Int 
+	b2 				Int 
+	a3 				Int 
+	b3 				Int 
+	a4 				Int 
+	b4 				Int 
+	permute		Int
+	idx				Int @unique
+	checked		Boolean @default(false)
+	flagged		Boolean @default(false)
+}

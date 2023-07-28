@@ -58,7 +58,7 @@ function case1Gen(case1: number,
 	const fx = new Polynomial([a1,b1,c1]);
 	const fPrime = fx.differentiate()
 	const fPrimeSimplified = fPrime.simplify();
-	const multiple = fPrimeSimplified.coeffs[0].divide(fPrime.coeffs[0]);
+	const multiple = fPrimeSimplified.coeffs[1].divide(fPrime.coeffs[1]);
 	const qn = math(`\\int \\frac{${fPrimeSimplified}}{${fx}} \\; \\mathrm{d}x`);
 	const alwaysPositive = new Fraction(b1).square().minus(new Fraction(4).times(a1).times(c1)).isLessThan(0) ? 0 : 1;
 	const lnTerm = new Term(multiple, `\\ln ${modulus(`${fx}`,2,alwaysPositive)}`);

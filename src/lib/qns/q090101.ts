@@ -60,14 +60,14 @@ function case1Gen(case1: number,
 	const fPrimeSimplified = fPrime.simplify();
 	const multiple = fPrimeSimplified.coeffs[0].divide(fPrime.coeffs[0]);
 	const qn = math(`\\int \\frac{${fPrimeSimplified}}{${fx}} \\; \\mathrm{d}x`);
-	const alwaysPositive = new Fraction(b1).square().minus(new Fraction(4).times(a1).times(c1)).isLessThan(0) ? 1 : 0;
+	const alwaysPositive = new Fraction(b1).square().minus(new Fraction(4).times(a1).times(c1)).isLessThan(0) ? 0 : 1;
 	const lnTerm = new Term(multiple, `\\ln ${modulus(`${fx}`,2,alwaysPositive)}`);
 	const ans = math(`${lnTerm} + c`);
 	return [qn, ans, ans, ''];
 }
 
 function modulus(x: string, a: number, signCase: number): string {
-	return (signCase===1 && a%2===0) ? `\\left( ${x} \\right)` : `\\lvert ${x} \\rvert`; 
+	return (signCase===0 && a%2===0) ? `\\left( ${x} \\right)`: `\\lvert ${x} \\rvert`;
 }
 
 function case2Gen(case2: number, a2: number, b2: number, n: number): [string, string, string, string] {

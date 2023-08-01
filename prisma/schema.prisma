@@ -151,3 +151,13 @@ model v_int_090201 {
 	checked		Boolean @default(false)
 	flagged		Boolean @default(false)
 }
+
+model v_int_090202 {
+	id				String @id
+	a 				Int 
+	n 				Int 
+	k					Int
+	idx				Int @unique
+	checked		Boolean @default(false)
+	flagged		Boolean @default(false)
+}

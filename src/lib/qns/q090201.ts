@@ -1,5 +1,5 @@
-import { Polynomial, Fraction, SquareRoot, Term, Expression } from 'mathlify';
-import { display, math, align, newParagraph } from 'mathlifier';
+import { math, newParagraph } from 'mathlifier';
+import { Expression, Fraction, Polynomial, SquareRoot, Term } from 'mathlify';
 
 export function qnGen(vars: {
 	a1: number,

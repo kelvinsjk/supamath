@@ -5,9 +5,9 @@
 	let pw = '';
 
 	//! CHANGE BELOW
-	import type { v_int_090201 as vType } from '@prisma/client';
-	const q = 'v_int_090201';
-	import { qnGen } from '$lib/qns/q090201';
+	import type { v_int_090202 as vType } from '@prisma/client';
+	const q = 'v_int_090202';
+	import { qnGen } from '$lib/qns/q090202';
 	//! CHANGE ABOVE
 
 	let {vars, count, total} = data;
